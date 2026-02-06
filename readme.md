@@ -22,7 +22,7 @@ Unlike typical data analysis projects that rely on static, pre-existing datasets
 ### 1. The Admin Portal
 The command center for university staff. Admins can visualize trends and process applications efficiently.
 
-![Admin Portal View](assets/admin_view.png)
+![Admin Portal View](assets/dashboard.mp4)
 
 * **Embedded Analytics:** A fully interactive Power BI report integrated directly into the Flask application.
 * **Application Management:** View, filter, and sort incoming student applications.
@@ -32,7 +32,7 @@ The command center for university staff. Admins can visualize trends and process
 ### 2. The Student Portal
 A user-friendly interface for applicants to manage their admission journey.
 
-![Student Apply Page](assets/student_apply.png)
+![Student Apply Page](assets/student_end.gif)
 
 * **Secure Authentication:** User registration and login functionality.
 * **Application Submission:** Comprehensive forms capturing GPA, SAT scores, and Statements of Purpose (SOP).
