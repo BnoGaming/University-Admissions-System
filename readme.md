@@ -88,7 +88,7 @@ I have designed this application to run in two modes:
 1.  **SQL Server Mode (Recommended):** Full production simulation.
 2.  **CSV Mode:** Lightweight version for testing without a database server.
 
-👉 **[Click here for the Detailed USAGE Guide](USAGE.md)**
+👉 **[Click here for the Detailed USAGE Guide](usage.md)**
 *Complete instructions on generating synthetic data, migrating to SQL, and configuring the Power BI dashboard.*
 
 ---
