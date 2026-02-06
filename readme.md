@@ -22,7 +22,8 @@ Unlike typical data analysis projects that rely on static, pre-existing datasets
 ### 1. The Admin Portal
 The command center for university staff. Admins can visualize trends and process applications efficiently.
 
-![Admin Portal View](assets/dashboard.mp4)
+![Admin Portal View](assets/dashboard.png)
+![Admin Portal View](assets/table.png)
 
 * **Embedded Analytics:** A fully interactive Power BI report integrated directly into the Flask application.
 * **Application Management:** View, filter, and sort incoming student applications.
