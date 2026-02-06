@@ -2,7 +2,7 @@
 
 A full-stack web application that simulates the complete lifecycle of a university admission process. It features **live data generation**, a transactional **SQL backend**, and **real-time analytics** via embedded Power BI.
 
-![Admin Dashboard Preview](assets/dashboard_main.png)
+![Admin Dashboard Preview](assets/overview.jpg)
 *(Fig 1: The Admin Dashboard showing real-time applicant metrics)*
 
 ---
@@ -78,6 +78,8 @@ Before storage, raw data undergoes significant transformation:
 ### 3. Load (Storage & Analytics)
 * **Operational Storage:** Processed data is loaded into **Microsoft SQL Server** using transaction-safe operations to ensure integrity.
 * **Analytical Loading:** The data is finally ingested by **Power BI**, which visualizes the "Load" stage through a live dashboard embedded back into the Admin Portal.
+
+---
 
 ## 🛠️ Installation & Usage
 
