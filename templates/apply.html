@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apply to University</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { 
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .form-container { 
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #3b82f6;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        .btn-primary {
+            background: #3b82f6;
+            border: none;
+            padding: 12px;
+        }
+        .required-star {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <div class="form-header">
+        <h3 class="fw-bold">Student Application Form</h3>
+        <p class="text-muted">Start your journey with MM University</p>
+    </div>
+
+    <form action="/submit_application" method="POST">
+        
+        <!-- Personal Details -->
+        <div class="section-title">Personal Information</div>
+        
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">First Name <span class="required-star">*</span></label>
+                <input type="text" name="first_name" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Last Name <span class="required-star">*</span></label>
+                <input type="text" name="last_name" class="form-control" required>
+            </div>
+        </div>
+        
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Date of Birth <span class="required-star">*</span></label>
+                <input type="date" name="dob" class="form-control" required max="2008-12-31" min="1990-01-01">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Gender <span class="required-star">*</span></label>
+                <select name="gender" class="form-select" required>
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">City <span class="required-star">*</span></label>
+                <input type="text" name="city" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Country <span class="required-star">*</span></label>
+                <select name="country" class="form-select" required>
+                    <option value="">Select Country</option>
+                    <option value="USA">United States</option>
+                    <option value="India">India</option>
+                    <option value="China">China</option>
+                    <option value="France">France</option>
+                    <option value="UK">United Kingdom</option>
+                    <option value="Nigeria">Nigeria</option>
+                    <option value="Canada">Canada</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">
+                <input type="checkbox" name="is_first_gen" value="true">
+                I am a first-generation college student
+            </label>
+        </div>
+
+        <!-- Academic Information -->
+        <div class="section-title">Academic Information</div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">High School GPA <span class="required-star">*</span></label>
+                <input type="number" name="gpa" class="form-control" step="0.01" min="0" max="4.0" required placeholder="0.00 - 4.00">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">SAT Score <span class="required-star">*</span></label>
+                <input type="number" name="sat_score" class="form-control" min="400" max="1600" required placeholder="400 - 1600">
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Achievement/Award (if any)</label>
+            <input type="text" name="achievement" class="form-control" placeholder="e.g., State Level Debate Champion, Math Olympiad Gold">
+            <small class="text-muted">List your most significant achievement or award</small>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">
+                <input type="checkbox" name="scholarship" value="true">
+                I am requesting scholarship consideration
+            </label>
+        </div>
+
+        <!-- Program Selection -->
+        <div class="section-title">Program Selection</div>
+
+        <div class="mb-3">
+            <label class="form-label">Select Program <span class="required-star">*</span></label>
+            <select name="program_id" class="form-select" required>
+                <option value="">Choose a program...</option>
+                {% for program in programs %}
+                <option value="{{ program.program_id }}">{{ program.name }} ({{ program.dept }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="mb-3">
+            <label class="form-label">Statement of Purpose <span class="required-star">*</span></label>
+            <textarea name="sop_text" class="form-control" rows="6" required 
+                      placeholder="Tell us why you want to join this program and how it aligns with your goals..."></textarea>
+            <small class="text-muted">Minimum 100 characters</small>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 mt-4">Submit Application</button>
+        
+        <div class="text-center mt-3">
+            <small class="text-muted">All fields marked with <span class="required-star">*</span> are required</small>
+        </div>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

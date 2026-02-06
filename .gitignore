@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.pyc
+
+# Environment
+.env
+
+# CSV Data Files
+*.csv
+
+# Database
+*.bak
+*.mdf
+*.ldf
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+#csv files
+academic_profile.csv
+age_ranges.csv
+applicants.csv
+applications.csv
+programs.csv
+roles.csv
+users.csv
+student_achievements.csv

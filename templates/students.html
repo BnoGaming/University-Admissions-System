@@ -1,0 +1,316 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold">Student Applications</h3>
+            <p class="text-muted mb-0">All 2026 applications</p>
+        </div>
+        <div>
+            <a href="/logout" class="btn btn-outline-danger">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </a>
+        </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <input type="text" class="form-control" id="searchInput" placeholder="Search by name, email, ID..." onkeyup="applyFilters()">
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" id="statusFilter" onchange="applyFilters()">
+                        <option value="">All Statuses</option>
+                        <option value="Waitlisted">Waitlisted</option>
+                        <option value="Accepted">Accepted</option>
+                        <option value="Rejected">Rejected</option>
+                        <option value="Enrolled">Enrolled</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="programFilter" onchange="applyFilters()">
+                        <option value="">All Programs</option>
+                        {% set programs = applicants|map(attribute='program_name')|unique|list %}
+                        {% for prog in programs %}
+                        {% if prog != 'Unknown' %}
+                        <option value="{{ prog }}">{{ prog }}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" id="sortBy" onchange="applyFilters()">
+                        <option value="date_desc">Latest First</option>
+                        <option value="date_asc">Oldest First</option>
+                        <option value="name_asc">Name A-Z</option>
+                        <option value="name_desc">Name Z-A</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-outline-secondary w-100" onclick="resetFilters()">
+                        <i class="bi bi-arrow-clockwise"></i> Reset
+                    </button>
+                </div>
+            </div>
+            <div class="mt-2">
+                <small class="text-muted">Showing <span id="resultCount">0</span> results</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Applications List</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" id="applicationsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Program</th>
+                        <th>Date</th>
+                        <th>SOP</th>
+                        <th>Details</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if applicants %}
+                        {% for app in applicants %}
+                        <tr class="app-row" 
+                            data-status="{{ app.status }}"
+                            data-program="{{ app.program_name }}"
+                            data-name="{{ app.first_name }} {{ app.last_name }}"
+                            data-email="{{ app.email }}"
+                            data-id="{{ app.application_id }}"
+                            data-date="{{ app.submission_date }}">
+                            <td><span class="badge bg-light text-dark">{{ app.application_id }}</span></td>
+                            <td><strong>{{ app.first_name }} {{ app.last_name }}</strong></td>
+                            <td><small>{{ app.email }}</small></td>
+                            <td><span class="badge bg-primary">{{ app.program_name if app.program_name != 'Unknown' else 'N/A' }}</span></td>
+                            <td><small>{{ app.submission_date }}</small></td>
+                            <td>
+                                <button class="btn btn-sm btn-link" onclick="showSOP('{{ app.first_name }}', '{{ app.sop_text|replace('`', '')|replace('\n', ' ') }}')">
+                                    SOP
+                                </button>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary" onclick='showDetails({{ app|tojson }})'>
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <span class="badge 
+                                    {% if app.status == 'Accepted' %}bg-success
+                                    {% elif app.status == 'Rejected' %}bg-danger
+                                    {% elif app.status == 'Waitlisted' %}bg-warning
+                                    {% elif app.status == 'Enrolled' %}bg-info
+                                    {% else %}bg-secondary{% endif %}" 
+                                    id="status-{{ app.application_id }}">
+                                    {{ app.status }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-success" onclick="updateStatus('{{ app.application_id }}', 'accept')">
+                                        <i class="bi bi-check-lg"></i>
+                                    </button>
+                                    <button class="btn btn-outline-danger" onclick="updateStatus('{{ app.application_id }}', 'reject')">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="9" class="text-center py-4 text-muted">No applications found</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- Details Modal -->
+<div class="modal fade" id="detailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailsModalTitle">Application Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="detailsModalBody">Loading...</div>
+        </div>
+    </div>
+</div>
+
+<!-- SOP Modal -->
+<div class="modal fade" id="sopModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="sopModalTitle">Statement of Purpose</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="sopModalBody">Loading...</div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{% raw %}
+<script>
+    function showSOP(name, text) {
+        document.getElementById('sopModalTitle').innerText = name + "'s Statement";
+        document.getElementById('sopModalBody').innerText = text || 'No statement provided.';
+        const modal = new bootstrap.Modal(document.getElementById('sopModal'));
+        modal.show();
+    }
+
+    function showDetails(app) {
+        const details = `
+            <div class="row">
+                <div class="col-6"><strong>Application ID:</strong></div>
+                <div class="col-6">${app.application_id}</div>
+                <div class="col-6"><strong>Name:</strong></div>
+                <div class="col-6">${app.first_name} ${app.last_name}</div>
+                <div class="col-6"><strong>Email:</strong></div>
+                <div class="col-6">${app.email}</div>
+                <div class="col-6"><strong>DOB:</strong></div>
+                <div class="col-6">${app.dob || 'N/A'}</div>
+                <div class="col-6"><strong>Gender:</strong></div>
+                <div class="col-6">${app.gender || 'N/A'}</div>
+                <div class="col-6"><strong>Country:</strong></div>
+                <div class="col-6">${app.country || 'N/A'}</div>
+                <div class="col-6"><strong>City:</strong></div>
+                <div class="col-6">${app.city || 'N/A'}</div>
+                <div class="col-6"><strong>Program:</strong></div>
+                <div class="col-6">${app.program_name || 'N/A'}</div>
+                <div class="col-6"><strong>Submission Date:</strong></div>
+                <div class="col-6">${app.submission_date}</div>
+                <div class="col-6"><strong>Days to Submit:</strong></div>
+                <div class="col-6">${app.days_to_submit || 'N/A'}</div>
+                <div class="col-6"><strong>Status:</strong></div>
+                <div class="col-6"><span class="badge bg-${app.status === 'Accepted' ? 'success' : app.status === 'Rejected' ? 'danger' : app.status === 'Waitlisted' ? 'warning' : app.status === 'Enrolled' ? 'info' : 'secondary'}">${app.status}</span></div>
+                <div class="col-6"><strong>Fees Paid:</strong></div>
+                <div class="col-6">${app.fees_paid ? 'Yes' : 'No'}</div>
+            </div>
+            <hr>
+            <div><strong>Statement of Purpose:</strong></div>
+            <div class="mt-2">${app.sop_text || 'No statement provided.'}</div>
+        `;
+        document.getElementById('detailsModalTitle').innerText = 'Application Details';
+        document.getElementById('detailsModalBody').innerHTML = details;
+        const modal = new bootstrap.Modal(document.getElementById('detailsModal'));
+        modal.show();
+    }
+
+    async function updateStatus(appId, action) {
+        if(!confirm("Are you sure?")) return;
+
+        try {
+            const response = await fetch('/update_application', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ app_id: appId, action: action })
+            });
+            const data = await response.json();
+            if (data.success) {
+                location.reload();
+            } else {
+                alert("Error updating status");
+            }
+        } catch (error) {
+            alert("Network error");
+        }
+    }
+    
+    function applyFilters() {
+        const searchText = document.getElementById('searchInput').value.toLowerCase();
+        const statusFilter = document.getElementById('statusFilter').value;
+        const programFilter = document.getElementById('programFilter').value;
+        const sortBy = document.getElementById('sortBy').value;
+        
+        const rows = Array.from(document.querySelectorAll('.app-row'));
+        let visibleCount = 0;
+        
+        rows.forEach(row => {
+            const name = row.dataset.name.toLowerCase();
+            const email = row.dataset.email.toLowerCase();
+            const id = row.dataset.id.toLowerCase();
+            const status = row.dataset.status;
+            const program = row.dataset.program;
+            
+            let show = true;
+            
+            // Search filter
+            if (searchText && !name.includes(searchText) && !email.includes(searchText) && !id.includes(searchText)) {
+                show = false;
+            }
+            
+            // Status filter
+            if (statusFilter && status !== statusFilter) {
+                show = false;
+            }
+            
+            // Program filter
+            if (programFilter && program !== programFilter) {
+                show = false;
+            }
+            
+            row.style.display = show ? '' : 'none';
+            if (show) visibleCount++;
+        });
+        
+        // Sort visible rows
+        const tbody = document.querySelector('#applicationsTable tbody');
+        const visibleRows = rows.filter(row => row.style.display !== 'none');
+        
+        visibleRows.sort((a, b) => {
+            switch(sortBy) {
+                case 'date_asc':
+                    return new Date(a.dataset.date) - new Date(b.dataset.date);
+                case 'date_desc':
+                    return new Date(b.dataset.date) - new Date(a.dataset.date);
+                case 'name_asc':
+                    return a.dataset.name.localeCompare(b.dataset.name);
+                case 'name_desc':
+                    return b.dataset.name.localeCompare(a.dataset.name);
+                default:
+                    return 0;
+            }
+        });
+        
+        // Re-append sorted visible rows first
+        visibleRows.forEach(row => tbody.appendChild(row));
+        
+        document.getElementById('resultCount').textContent = visibleCount;
+    }
+
+    function resetFilters() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('statusFilter').value = '';
+        document.getElementById('programFilter').value = '';
+        document.getElementById('sortBy').value = 'date_desc';
+        applyFilters();
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        applyFilters();
+    });
+</script>
+{% endraw %}
+{% endblock %}
